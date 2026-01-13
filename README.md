@@ -5,7 +5,7 @@ Solución de Integración Empresarial (ESB) diseñada para **REDAFI** con el obj
 
 Desarrollado sobre **Red Hat Fuse** y **Apache ActiveMQ** utilizando **Apache Camel** y Blueprint OSGi.
 
-## 🚀 Descripción del Proyecto
+## Descripción del Proyecto
 
 Este sistema resuelve la problemática de fragmentación de datos orquestando la ingesta desde cuatro orígenes distintos:
 1.  **Archivos Planos (TXT)**: Sistemas legados.
@@ -15,15 +15,29 @@ Este sistema resuelve la problemática de fragmentación de datos orquestando la
 
 El bus de integración procesa estos flujos mediante una arquitectura orientada a servicios (SOA), aplicando patrones de integración empresarial (EIP) para garantizar la consistencia y disponibilidad de los datos.
 
-## 🛠️ Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
-* **Runtime:** Red Hat Fuse 7.13 (Apache Karaf Container)
-* **Framework:** Apache Camel (Blueprint XML)
-* **Middleware:** Apache ActiveMQ (Broker de Mensajería)
-* **Java:** OpenJDK 11
-* **OS:** Linux openSUSE Tumbleweed
+## Pila Técnica (Tech Stack)
 
-## 🧩 Patrones de Integración (EIP) Implementados
+### Entorno de Ejecución (Runtime)
+* **Contenedor OSGi:** Red Hat Fuse 7.13 (Apache Karaf)
+* **Framework de Integración:** Apache Camel 2.23 (Blueprint XML)
+* **Message Broker:** Apache ActiveMQ 5.18 (Classic)
+* **Servidor de Aplicaciones:** Jetty 9 (Integrado en Camel)
+* **Lenguaje:** Java 11 (OpenJDK 11.0.29)
+
+### Herramientas de Desarrollo
+* **Sistema Operativo:** Linux openSUSE Tumbleweed
+* **Editor de Código:** Kate 
+* **Control de Versiones:** Git
+* **Terminal:** Konsole
+* **Pruebas de API:** cURL 
+
+### Formatos de Datos
+* **Intercambio:** JSON, XML, Texto Plano
+* **Protocolos:** HTTP/REST, JMS (Java Message Service), File System
+
+##  Patrones de Integración (EIP) Implementados
 
 La solución implementa una arquitectura robusta basada en los siguientes patrones:
 
@@ -32,13 +46,13 @@ La solución implementa una arquitectura robusta basada en los siguientes patron
 3.  **Content Enricher:** Inyección automática de metadatos (Timestamp, Firmas de Auditoría) y validación contra base de datos interna.
 4.  **Content Based Router:** Enrutamiento inteligente basado en la prioridad del origen (API REST -> Cola VIP).
 
-## 📋 Prerrequisitos
+##  Prerrequisitos
 
 * Red Hat Fuse 7.x (o Apache ServiceMix)
 * Apache ActiveMQ 5.18+
 * Java 11
 
-## ⚙️ Instalación y Despliegue
+## ⚙ Instalación y Despliegue
 
 1.  **Iniciar ActiveMQ:**
     Asegúrese de que el broker esté corriendo en el puerto `61616`.
@@ -58,7 +72,7 @@ La solución implementa una arquitectura robusta basada en los siguientes patron
     cp src/main/resources/OSGI-INF/blueprint/redafi-context.xml $FUSE_HOME/deploy/
     ```
 
-## 🧪 Pruebas de Uso
+##  Pruebas de Uso
 
 El sistema monitorea automáticamente las carpetas de entrada y el puerto HTTP `9999`.
 
