@@ -1,0 +1,77 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:camel="http://camel.apache.org/schema/blueprint">
+
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="tcp://localhost:61616"/>
+        <property name="userName" value="admin"/>
+        <property name="password" value="admin"/>
+    </bean>
+
+    <camelContext id="contexto-redafi-examen" xmlns="http://camel.apache.org/schema/blueprint">
+
+        <route id="input-txt">
+            <from uri="file:/home/sebas/Proyectos/Examen_Redafi/datos/plano?noop=true"/>
+            <log message="[TXT] Archivo detectado: ${file:name}"/>
+            <setBody>
+                <simple>{ "origen": "TXT", "tipo": "manual", "datos": "${body}" }</simple>
+            </setBody>
+            <to uri="direct:procesamiento_central"/>
+        </route>
+
+        <route id="input-json">
+            <from uri="file:/home/sebas/Proyectos/Examen_Redafi/datos/json?noop=true"/>
+            <log message="[JSON] Archivo detectado: ${file:name}"/>
+            <to uri="direct:procesamiento_central"/>
+        </route>
+
+        <route id="input-xml">
+            <from uri="file:/home/sebas/Proyectos/Examen_Redafi/datos/xml?noop=true"/>
+            <log message="[XML] Archivo detectado: ${file:name}"/>
+            <setBody>
+                <simple>{ "origen": "XML", "xml_raw": "${body}" }</simple>
+            </setBody>
+            <to uri="direct:procesamiento_central"/>
+        </route>
+
+        <route id="input-api-rest">
+            <from uri="jetty:http://0.0.0.0:9999/api/redafi/datos?httpMethodRestrict=POST"/>
+            <log message="[API REST] Petición HTTP recibida"/>
+            <setBody>
+                <simple>{ "origen": "API", "prioridad": "ALTA", "payload": "${body}" }</simple>
+            </setBody>
+
+            <to uri="direct:procesamiento_central"/>
+
+            <setBody>
+                <constant>{ "status": "OK", "mensaje": "Datos recibidos por REDAFI Core" }</constant>
+            </setBody>
+        </route>
+
+        <route id="core-redafi">
+            <from uri="direct:procesamiento_central"/>
+
+            <log message=">> [NORMALIZADOR] Estandarizando mensaje..."/>
+
+            <setBody>
+                <simple>${body} | ENRIQUECIDO_PROCESO: REDAFI_V1 | FECHA: ${date:now:yyyy-MM-dd HH:mm:ss}</simple>
+            </setBody>
+
+            <log message=">> [PROCESADO] ${body}"/>
+
+            <choice>
+                <when>
+                    <simple>${body} contains 'API'</simple>
+                    <log message=">> [ROUTER] Origen API detectado -> Enviando a COLA VIP"/>
+                    <to uri="activemq:queue:REDAFI_VIP_QUEUE"/>
+                </when>
+                <otherwise>
+                    <log message=">> [ROUTER] Origen Estándar -> Enviando a COLA GENERAL"/>
+                    <to uri="activemq:queue:REDAFI_GENERAL_QUEUE"/>
+                </otherwise>
+            </choice>
+        </route>
+
+    </camelContext>
+
+</blueprint>
